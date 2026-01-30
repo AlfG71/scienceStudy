@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Science Study App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Fira+Code&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --ocean-deep: #0a2463;
+            --ocean-mid: #247ba0;
+            --ocean-light: #1e96fc;
+            --wave-foam: #e8f1f5;
+            --sand: #f4e9cd;
+            --coral: #ff6b9d;
+            --success: #06d6a0;
+            --warning: #f77f00;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-mid) 50%, var(--ocean-light) 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .nav-btn.active {
+            background: var(--coral);
+            border-color: var(--coral);
+        }
+        
+        .content-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            min-height: 400px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .flashcard {
+            background: white;
+            color: var(--ocean-deep);
+            border-radius: 15px;
+            padding: 40px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-front, .flashcard-back {
+            backface-visibility: hidden;
+            width: 100%;
+        }
+        
+        .flashcard-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard h3 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: var(--ocean-mid);
+        }
+        
+        .flashcard p {
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+        
+        .card-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .btn {
+            background: var(--ocean-mid);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: var(--ocean-light);
+            transform: scale(1.05);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #05c296;
+        }
+        
+        .quiz-question {
+            background: white;
+            color: var(--ocean-deep);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-question h3 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: var(--ocean-mid);
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            background: var(--wave-foam);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .quiz-option:hover {
+            background: var(--sand);
+            transform: translateX(5px);
+        }
+        
+        .quiz-option.selected {
+            border-color: var(--ocean-mid);
+            background: var(--ocean-light);
+            color: white;
+        }
+        
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+        
+        .quiz-option.incorrect {
+            border-color: var(--warning);
+            background: var(--warning);
+            color: white;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid var(--wave-foam);
+            font-size: 1em;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .score-display {
+            background: var(--coral);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .score-display h2 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .matching-game {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .matching-column h3 {
+            margin-bottom: 15px;
+            color: var(--sand);
+        }
+        
+        .matching-item {
+            background: white;
+            color: var(--ocean-deep);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .matching-item:hover {
+            transform: scale(1.03);
+        }
+        
+        .matching-item.selected {
+            border-color: var(--coral);
+            background: var(--coral);
+            color: white;
+        }
+        
+        .matching-item.matched {
+            background: var(--success);
+            color: white;
+            cursor: default;
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .progress-fill {
+            background: var(--coral);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .hint-box {
+            background: rgba(255, 235, 59, 0.2);
+            border-left: 4px solid var(--sand);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .graph-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .graph-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .stats-problem {
+            background: white;
+            color: var(--ocean-deep);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-problem code {
+            background: var(--wave-foam);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🌊 Ocean Science Study Hub</h1>
+            <p>Master your science test on February 3, 2026!</p>
+        </div>
+        
+        <div class="nav-buttons" id="navButtons">
+            <button class="nav-btn active" onclick="showSection('flashcards')">📚 Flashcards</button>
+            <button class="nav-btn" onclick="showSection('truefalse')">✓✗ True/False</button>
+            <button class="nav-btn" onclick="showSection('matching')">🎯 Matching</button>
+            <button class="nav-btn" onclick="showSection('graphs')">📊 Graphs</button>
+            <button class="nav-btn" onclick="showSection('statistics')">📈 Statistics</button>
+            <button class="nav-btn" onclick="showSection('test')">🎓 Practice Test</button>
+        </div>
+        
+        <div class="content-section" id="contentSection">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Data from the review sheet
+        const vocabulary = {
+            lesson1: [
+                { term: "abyssal plain", definition: "large, flat area of the seafloor that extends across the deepest parts of the ocean basin" },
+                { term: "brackish", definition: "describes freshwater mixed with seawater" },
+                { term: "manipulate", definition: "to operate by hand or by mechanical means" },
+                { term: "photosynthesis", definition: "chemical process that converts light energy, water, and carbon dioxide into sugar" },
+                { term: "salinity", definition: "measure of the mass of dissolved solids in a mass of water" },
+                { term: "seawater", definition: "has an average salinity of 35 parts per thousand" }
+            ],
+            lesson2: [
+                { term: "neap tide", definition: "occurs when Earth, the Moon, and the Sun form a right angle; has the lowest tidal range" },
+                { term: "sea level", definition: "average level of the ocean's surface at any given time" },
+                { term: "spring tide", definition: "occurs when Earth, the Moon, and the Sun form a straight line; has the largest tidal range" },
+                { term: "tidal range", definition: "difference in water level between a high tide and a low tide" },
+                { term: "tide", definition: "periodic rise and fall of the ocean's surface caused by the gravitational force between Earth and the Moon, and Earth and the Sun" },
+                { term: "tsunami", definition: "wave that forms when an ocean disturbance suddenly moves a large volume of water" }
+            ]
+        };
+
+        const trueFalseQuestions = [
+            { 
+                question: "The five oceans are the Antarctic Ocean, the Pacific Ocean, the Atlantic Ocean, the Indian Ocean, and the Southern Ocean.",
+                answer: true,
+                explanation: "These are indeed the five major oceans on Earth."
+            },
+            {
+                question: "Salinity is a measure of the mass of dissolved solids in a mass of water.",
+                answer: true,
+                explanation: "This is the correct definition of salinity."
+            },
+            {
+                question: "A salinity of 35 parts per thousand means that if you measured 1,000 g of seawater, 1,000 g would be water molecules and 35 g would be salts.",
+                answer: false,
+                explanation: "Actually, 965 g would be water molecules and 35 g would be salts (1000g - 35g = 965g water)."
+            },
+            {
+                question: "The salinity of seawater is not constant.",
+                answer: true,
+                explanation: "Salinity varies by location due to factors like evaporation, precipitation, and river input."
+            },
+            {
+                question: "Brackish water is polluted water mixed with seawater.",
+                answer: false,
+                explanation: "Brackish water is freshwater mixed with seawater, not polluted water."
+            }
+        ];
+
+        const matchingPairs = [
+            { term: "E. crest", definition: "1. the highest part of a wave" },
+            { term: "H. trough", definition: "2. the lowest part of a wave" },
+            { term: "J. wave height", definition: "3. the vertical distance between the crest and the trough" },
+            { term: "B. wavelength", definition: "4. the horizontal distance from crest to crest or from trough to trough" },
+            { term: "I. surface waves", definition: "5. the currents formed by wind blowing over the surface of water" },
+            { term: "K. tsunami", definition: "6. a wave that forms when an ocean disturbance suddenly moves a large volume of water" },
+            { term: "F. sea level", definition: "7. the average level of the ocean's surface at any given time" },
+            { term: "G. tides", definition: "8. the periodic rise and fall of the ocean's surface caused by the gravitational force between Earth and the Moon and between Earth and the Sun" },
+            { term: "A. tidal range", definition: "9. the difference in water level between a high tide and a low tide" },
+            { term: "C. spring tide", definition: "10. a tide that has the largest tidal range" },
+            { term: "D. neap tide", definition: "11. a tide that has the lowest tidal range" }
+        ];
+
+        const graphQuestions = [
+            {
+                question: "What does the first graph illustrate about temperature in the ocean as depth increases?",
+                answer: "Temperature decreases as depth increases. There are distinct layers: warm surface water, a thermocline where temperature drops rapidly, and cold deep water. Temperature is relatively constant below 1,000m at around 4°C."
+            },
+            {
+                question: "At what depths does the temperature of water differ between polar regions and temperate or tropical regions?",
+                answer: "At depths from 0 to about 1,500 meters. In polar regions, water is cold throughout. In temperate/tropical regions, surface water is warm but cools with depth. Below 1,500m, temperatures are similar in all regions."
+            },
+            {
+                question: "What is the approximate temperature of water below a depth of 1,000 m?",
+                answer: "Approximately 4°C (or between 2-4°C)"
+            },
+            {
+                question: "At what depths is the salinity of ocean water relatively constant?",
+                answer: "Below about 1,000 meters depth (in the deep ocean, polar regions, and temperate/tropical regions)"
+            },
+            {
+                question: "Why does the salinity of surface water in polar regions differ from the salinity of surface water in temperate or tropical regions?",
+                answer: "In polar regions, melting ice dilutes the surface water, lowering salinity. In temperate/tropical regions, evaporation exceeds precipitation, increasing salinity. Additionally, polar regions have less evaporation."
+            }
+        ];
+
+        const statisticsProblems = [
+            {
+                question: "Over a 48-hour period in a particular location, the high tides were measured at 0.57 m, 0.83 m, 0.62 m, and 0.78 m. What is the range and the mean of the high tides?",
+                data: [0.57, 0.83, 0.62, 0.78],
+                rangeAnswer: "0.26",
+                meanAnswer: "0.70"
+            },
+            {
+                question: "Over a 48-hour period in a particular location, the low tides were measured at 0.052 m, 0.089 m, 0.067 m, and 0.072 m. What is the range and the mean of the low tides?",
+                data: [0.052, 0.089, 0.067, 0.072],
+                rangeAnswer: "0.037",
+                meanAnswer: "0.070"
+            },
+            {
+                question: "Four different samples of water have the following levels of salinity: 15 ppt, 23 ppt, 18 ppt, 20 ppt. What is the range and the mean of the salinity of the samples?",
+                data: [15, 23, 18, 20],
+                rangeAnswer: "8",
+                meanAnswer: "19"
+            },
+            {
+                question: "Five different samples of water have the following levels of salinity: 20 ppt, 21 ppt, 17 ppt, 19 ppt, 20 ppt. What is the range and the mean of the salinity of the samples?",
+                data: [20, 21, 17, 19, 20],
+                rangeAnswer: "4",
+                meanAnswer: "19.4"
+            }
+        ];
+
+        // State management
+        let currentFlashcard = 0;
+        let isFlipped = false;
+        let currentQuizIndex = 0;
+        let quizAnswers = [];
+        let testScore = 0;
+        let matchingSelected = [];
+        let matchedPairs = [];
+
+        // Section management
+        function showSection(section) {
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const content = document.getElementById('contentSection');
+            
+            switch(section) {
+                case 'flashcards':
+                    renderFlashcards();
+                    break;
+                case 'truefalse':
+                    renderTrueFalse();
+                    break;
+                case 'matching':
+                    renderMatching();
+                    break;
+                case 'graphs':
+                    renderGraphs();
+                    break;
+                case 'statistics':
+                    renderStatistics();
+                    break;
+                case 'test':
+                    renderTest();
+                    break;
+            }
+        }
+
+        // Flashcards
+        function renderFlashcards() {
+            const allCards = [...vocabulary.lesson1, ...vocabulary.lesson2];
+            const card = allCards[currentFlashcard];
+            
+            const content = document.getElementById('contentSection');
+            content.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2>Vocabulary Flashcards</h2>
+                    <p style="opacity: 0.8;">Card ${currentFlashcard + 1} of ${allCards.length}</p>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${((currentFlashcard + 1) / allCards.length) * 100}%"></div>
+                </div>
+                
+                <div class="flashcard ${isFlipped ? 'flipped' : ''}" onclick="flipCard()">
+                    <div class="flashcard-front">
+                        <h3>Term:</h3>
+                        <p>${card.term}</p>
+                        <p style="font-size: 0.9em; opacity: 0.6; margin-top: 20px;">Click to reveal definition</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <h3>Definition:</h3>
+                        <p>${card.definition}</p>
+                        <p style="font-size: 0.9em; opacity: 0.6; margin-top: 20px;">Click to see term</p>
+                    </div>
+                </div>
+                
+                <div class="card-controls">
+                    <button class="btn" onclick="previousCard()" ${currentFlashcard === 0 ? 'disabled' : ''}>← Previous</button>
+                    <button class="btn" onclick="flipCard()">🔄 Flip Card</button>
+                    <button class="btn" onclick="nextCard()" ${currentFlashcard === allCards.length - 1 ? 'disabled' : ''}>Next →</button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="resetFlashcards()">🔄 Restart from Beginning</button>
+                </div>
+            `;
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            renderFlashcards();
+        }
+
+        function nextCard() {
+            const allCards = [...vocabulary.lesson1, ...vocabulary.lesson2];
+            if (currentFlashcard < allCards.length - 1) {
+                currentFlashcard++;
+                isFlipped = false;
+                renderFlashcards();
+            }
+        }
+
+        function previousCard() {
+            if (currentFlashcard > 0) {
+                currentFlashcard--;
+                isFlipped = false;
+                renderFlashcards();
+            }
+        }
+        
+        function resetFlashcards() {
+            currentFlashcard = 0;
+            isFlipped = false;
+            renderFlashcards();
+        }
+
+        // True/False Quiz
+        function renderTrueFalse() {
+            const content = document.getElementById('contentSection');
+            let html = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2>True or False Quiz</h2>
+                    <p style="opacity: 0.8;">Test your knowledge!</p>
+                </div>
+            `;
+            
+            trueFalseQuestions.forEach((q, index) => {
+                const answered = quizAnswers[index] !== undefined;
+                const correct = answered && quizAnswers[index] === q.answer;
+                
+                html += `
+                    <div class="quiz-question">
+                        <h3>${index + 1}. ${q.question}</h3>
+                        <div class="quiz-options">
+                            <div class="quiz-option ${answered ? (quizAnswers[index] === true ? (correct ? 'correct' : 'incorrect') : '') : ''}" 
+                                 onclick="answerTrueFalse(${index}, true)" 
+                                 style="${answered ? 'pointer-events: none;' : ''}">
+                                ✓ True
+                            </div>
+                            <div class="quiz-option ${answered ? (quizAnswers[index] === false ? (correct ? 'correct' : 'incorrect') : '') : ''}" 
+                                 onclick="answerTrueFalse(${index}, false)"
+                                 style="${answered ? 'pointer-events: none;' : ''}">
+                                ✗ False
+                            </div>
+                        </div>
+                        ${answered ? `
+                            <div class="hint-box">
+                                ${correct ? '✅ Correct!' : '❌ Incorrect.'} ${q.explanation}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            if (quizAnswers.length === trueFalseQuestions.length) {
+                const score = quizAnswers.filter((ans, i) => ans === trueFalseQuestions[i].answer).length;
+                html += `
+                    <div class="score-display">
+                        <h2>Score: ${score}/${trueFalseQuestions.length}</h2>
+                        <p>${score === trueFalseQuestions.length ? '🎉 Perfect Score!' : 'Keep practicing!'}</p>
+                        <button class="btn" onclick="resetTrueFalse()" style="margin-top: 15px;">🔄 Try Again</button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn" onclick="resetTrueFalse()">🔄 Reset Quiz</button>
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = html;
+        }
+
+        function answerTrueFalse(index, answer) {
+            quizAnswers[index] = answer;
+            renderTrueFalse();
+        }
+
+        function resetTrueFalse() {
+            quizAnswers = [];
+            renderTrueFalse();
+        }
+
+        // Matching Game
+        let shuffledDefinitions = [];
+        let matchingAttempts = 0;
+        let matchingErrors = 0;
+        
+        function renderMatching() {
+            const content = document.getElementById('contentSection');
+            const terms = matchingPairs.map(p => p.term);
+            
+            // Only shuffle on first render or reset
+            if (shuffledDefinitions.length === 0) {
+                shuffledDefinitions = [...matchingPairs.map(p => p.definition)].sort(() => Math.random() - 0.5);
+            }
+            
+            let html = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2>Matching Game</h2>
+                    <p style="opacity: 0.8;">Click a term, then click its matching definition</p>
+                    <p style="font-size: 0.9em;">Matched: ${matchedPairs.length}/${matchingPairs.length} | Errors: ${matchingErrors}</p>
+                </div>
+                
+                <div class="hint-box" style="margin-bottom: 20px;">
+                    <strong>📌 How to play:</strong> Click on a term (left side), then click on its matching definition (right side). 
+                    You'll get instant feedback! ✅ = Correct, ❌ = Try again
+                </div>
+                
+                <div class="matching-game">
+                    <div class="matching-column">
+                        <h3>Terms & Letters</h3>
+                        ${terms.map((term, i) => `
+                            <div class="matching-item ${matchedPairs.some(m => m.termIndex === i) ? 'matched' : ''} ${matchingSelected[0] === 'term' && matchingSelected[1] === i ? 'selected' : ''}"
+                                 onclick="selectMatching('term', ${i})"
+                                 style="${matchedPairs.some(m => m.termIndex === i) ? 'pointer-events: none;' : ''}">
+                                ${matchedPairs.some(m => m.termIndex === i) ? '✅ ' : ''}${term}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="matching-column">
+                        <h3>Definitions & Numbers</h3>
+                        ${shuffledDefinitions.map((def, i) => `
+                            <div class="matching-item ${matchedPairs.some(m => m.defIndex === i) ? 'matched' : ''} ${matchingSelected[0] === 'def' && matchingSelected[1] === i ? 'selected' : ''}"
+                                 onclick="selectMatching('def', ${i})"
+                                 style="${matchedPairs.some(m => m.defIndex === i) ? 'pointer-events: none;' : ''}">
+                                ${matchedPairs.some(m => m.defIndex === i) ? '✅ ' : ''}${def}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                ${matchedPairs.length === matchingPairs.length ? `
+                    <div class="score-display" style="margin-top: 20px;">
+                        <h2>🎉 Perfect! All Matched!</h2>
+                        <p>Total Attempts: ${matchingAttempts}</p>
+                        <p>${matchingErrors === 0 ? '🏆 Flawless Victory!' : `Errors: ${matchingErrors}`}</p>
+                    </div>
+                ` : ''}
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="resetMatching()">🔄 Reset Game</button>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        function selectMatching(type, index) {
+            if (matchingSelected.length === 0) {
+                matchingSelected = [type, index];
+                renderMatching();
+            } else if (matchingSelected[0] === type) {
+                matchingSelected = [type, index];
+                renderMatching();
+            } else {
+                // Check if match
+                const termIndex = matchingSelected[0] === 'term' ? matchingSelected[1] : index;
+                const defIndex = matchingSelected[0] === 'def' ? matchingSelected[1] : index;
+                
+                const selectedDef = shuffledDefinitions[defIndex];
+                matchingAttempts++;
+                
+                if (matchingPairs[termIndex].definition === selectedDef) {
+                    // Correct match!
+                    matchedPairs.push({termIndex, defIndex});
+                    matchingSelected = [];
+                    
+                    // Show success feedback
+                    const content = document.getElementById('contentSection');
+                    const feedback = document.createElement('div');
+                    feedback.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--success); color: white; padding: 30px 50px; border-radius: 20px; font-size: 2em; font-weight: bold; z-index: 1000; animation: fadeIn 0.3s ease;';
+                    feedback.textContent = '✅ Correct!';
+                    document.body.appendChild(feedback);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(feedback);
+                        renderMatching();
+                    }, 800);
+                } else {
+                    // Incorrect match
+                    matchingErrors++;
+                    
+                    // Show error feedback
+                    const content = document.getElementById('contentSection');
+                    const feedback = document.createElement('div');
+                    feedback.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--warning); color: white; padding: 30px 50px; border-radius: 20px; font-size: 2em; font-weight: bold; z-index: 1000; animation: fadeIn 0.3s ease;';
+                    feedback.textContent = '❌ Try Again!';
+                    document.body.appendChild(feedback);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(feedback);
+                        matchingSelected = [];
+                        renderMatching();
+                    }, 800);
+                }
+            }
+        }
+
+        function resetMatching() {
+            matchingSelected = [];
+            matchedPairs = [];
+            shuffledDefinitions = [];
+            matchingAttempts = 0;
+            matchingErrors = 0;
+            renderMatching();
+        }
+
+        // Graphs
+        function renderGraphs() {
+            const content = document.getElementById('contentSection');
+            let html = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2>📊 Graph Analysis Questions</h2>
+                    <p style="opacity: 0.8;">Answer questions about ocean temperature, salinity, and density</p>
+                </div>
+                
+                <div class="hint-box" style="margin-bottom: 20px;">
+                    <strong>📌 Remember:</strong> Temperature decreases with depth. Salinity is relatively constant below 1,000m. Density increases with depth due to pressure.
+                </div>
+            `;
+            
+            graphQuestions.forEach((q, index) => {
+                html += `
+                    <div class="quiz-question" style="margin-bottom: 20px;">
+                        <h3>${index + 1}. ${q.question}</h3>
+                        <div class="input-group">
+                            <textarea id="graph-${index}" 
+                                      style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--wave-foam); font-family: 'Poppins', sans-serif; min-height: 80px;"
+                                      placeholder="Type your answer here..."></textarea>
+                        </div>
+                        <button class="btn" onclick="showGraphAnswer(${index})" style="margin-top: 10px;">Show Answer</button>
+                        <div id="graph-answer-${index}" style="display: none;" class="hint-box">
+                            <strong>✓ Answer:</strong> ${q.answer}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="resetGraphs()">🔄 Reset All Answers</button>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        function showGraphAnswer(index) {
+            document.getElementById(`graph-answer-${index}`).style.display = 'block';
+        }
+        
+        function resetGraphs() {
+            renderGraphs();
+        }
+
+        // Statistics
+        function renderStatistics() {
+            const content = document.getElementById('contentSection');
+            let html = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2>📈 Statistics Practice</h2>
+                    <p style="opacity: 0.8;">Calculate mean and range</p>
+                </div>
+                
+                <div class="hint-box" style="margin-bottom: 20px;">
+                    <strong>📌 Formulas:</strong><br>
+                    <code>Range = Largest - Smallest</code><br>
+                    <code>Mean = Sum of all values ÷ Number of values</code>
+                </div>
+            `;
+            
+            statisticsProblems.forEach((problem, index) => {
+                html += `
+                    <div class="stats-problem" style="margin-bottom: 20px;">
+                        <h3>Problem ${index + 1}</h3>
+                        <p>${problem.question}</p>
+                        <p><strong>Data:</strong> <code>${problem.data.join(', ')}</code></p>
+                        
+                        <div class="input-group">
+                            <label>Range:</label>
+                            <input type="text" id="range-${index}" placeholder="Enter range">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>Mean:</label>
+                            <input type="text" id="mean-${index}" placeholder="Enter mean">
+                        </div>
+                        
+                        <button class="btn" onclick="checkStats(${index})" style="margin-top: 10px;">Check Answer</button>
+                        <div id="stats-result-${index}" style="margin-top: 10px;"></div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="resetStatistics()">🔄 Reset All Problems</button>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        function checkStats(index) {
+            const problem = statisticsProblems[index];
+            const rangeInput = document.getElementById(`range-${index}`).value;
+            const meanInput = document.getElementById(`mean-${index}`).value;
+            
+            const rangeCorrect = parseFloat(rangeInput) === parseFloat(problem.rangeAnswer);
+            const meanCorrect = parseFloat(meanInput) === parseFloat(problem.meanAnswer);
+            
+            let result = '<div class="hint-box">';
+            result += `<strong>Range:</strong> ${rangeCorrect ? '✅ Correct!' : '❌ Incorrect. Answer: ' + problem.rangeAnswer}<br>`;
+            result += `<strong>Mean:</strong> ${meanCorrect ? '✅ Correct!' : '❌ Incorrect. Answer: ' + problem.meanAnswer}`;
+            result += '</div>';
+            
+            document.getElementById(`stats-result-${index}`).innerHTML = result;
+        }
+        
+        function resetStatistics() {
+            renderStatistics();
+        }
+
+        // Practice Test
+        function renderTest() {
+            const content = document.getElementById('contentSection');
+            
+            const totalQuestions = trueFalseQuestions.length + 
+                                  (vocabulary.lesson1.length + vocabulary.lesson2.length) + 
+                                  matchingPairs.length + 
+                                  statisticsProblems.length + 
+                                  graphQuestions.length;
+            
+            content.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2>🎓 Comprehensive Practice Test</h2>
+                    <p style="opacity: 0.8;">Full test simulation - ${totalQuestions} total questions</p>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>Test Overview</h3>
+                    <p>This comprehensive practice test includes all material from your review sheet:</p>
+                    <ul style="margin-left: 20px; margin-top: 15px; line-height: 1.8;">
+                        <li><strong>Part 1:</strong> ${trueFalseQuestions.length} True/False questions</li>
+                        <li><strong>Part 2:</strong> ${vocabulary.lesson1.length + vocabulary.lesson2.length} Vocabulary definitions</li>
+                        <li><strong>Part 3:</strong> ${matchingPairs.length} Matching pairs</li>
+                        <li><strong>Part 4:</strong> ${statisticsProblems.length} Statistics problems (mean & range)</li>
+                        <li><strong>Part 5:</strong> ${graphQuestions.length} Graph analysis questions</li>
+                    </ul>
+                    
+                    <div class="hint-box" style="margin-top: 20px;">
+                        <strong>💡 Tips:</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Take your time and read each question carefully</li>
+                            <li>Show your work for statistics problems</li>
+                            <li>Answer all questions to the best of your ability</li>
+                            <li>Review the flashcards before starting if needed</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="btn btn-success" onclick="startTest()" style="font-size: 1.2em; padding: 15px 40px;">Start Practice Test</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startTest() {
+            // Reset test state
+            quizAnswers = [];
+            
+            const content = document.getElementById('contentSection');
+            let html = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2>🎓 Practice Test</h2>
+                    <p style="opacity: 0.8;">Take your time and show what you know!</p>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>Part 1: True or False (5 questions)</h3>
+            `;
+            
+            trueFalseQuestions.forEach((q, index) => {
+                html += `
+                    <div style="margin: 20px 0;">
+                        <p><strong>${index + 1}. ${q.question}</strong></p>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="tf-${index}" value="true" onchange="setTestAnswer('tf', ${index}, true)"> True
+                            </label>
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="tf-${index}" value="false" onchange="setTestAnswer('tf', ${index}, false)"> False
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            // Add ALL vocabulary section
+            const allVocab = [...vocabulary.lesson1, ...vocabulary.lesson2];
+            html += `
+                <div class="quiz-question">
+                    <h3>Part 2: Vocabulary Definitions (${allVocab.length} terms)</h3>
+                    <p>Define the following terms:</p>
+            `;
+            
+            allVocab.forEach((v, index) => {
+                html += `
+                    <div class="input-group">
+                        <label><strong>${index + 1}. ${v.term}</strong></label>
+                        <textarea id="vocab-${index}" placeholder="Write the definition..." style="width: 100%; padding: 10px; border-radius: 8px; min-height: 60px;"></textarea>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            // Add matching section
+            html += `
+                <div class="quiz-question">
+                    <h3>Part 3: Matching (11 pairs)</h3>
+                    <p>Match each term/letter with its corresponding definition/number. Write the letter next to the number.</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                        <div>
+                            <strong>Terms:</strong>
+                            ${matchingPairs.map(p => `<div style="margin: 5px 0;">${p.term}</div>`).join('')}
+                        </div>
+                        <div>
+                            <strong>Definitions:</strong>
+                            ${matchingPairs.map(p => `<div style="margin: 5px 0;">${p.definition}</div>`).join('')}
+                        </div>
+                    </div>
+                    <div class="input-group" style="margin-top: 20px;">
+                        <label>Your Matches (e.g., "E-1, H-2, J-3, ..."):</label>
+                        <textarea id="matching-answers" placeholder="Write your matches here..." style="width: 100%; padding: 10px; border-radius: 8px; min-height: 80px;"></textarea>
+                    </div>
+                </div>
+            `;
+            
+            // Add all statistics problems
+            html += `
+                <div class="quiz-question">
+                    <h3>Part 4: Statistics Problems (${statisticsProblems.length} problems)</h3>
+            `;
+            
+            statisticsProblems.forEach((p, index) => {
+                html += `
+                    <div style="margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <p><strong>Problem ${index + 1}:</strong></p>
+                        <p>${p.question}</p>
+                        <p style="margin-top: 10px;"><strong>Data:</strong> <code>${p.data.join(', ')}</code></p>
+                        <div class="input-group">
+                            <label>Range:</label>
+                            <input type="text" id="test-range-${index}" placeholder="Calculate the range">
+                        </div>
+                        <div class="input-group">
+                            <label>Mean:</label>
+                            <input type="text" id="test-mean-${index}" placeholder="Calculate the mean">
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            // Add graph analysis questions
+            html += `
+                <div class="quiz-question">
+                    <h3>Part 5: Graph Analysis (${graphQuestions.length} questions)</h3>
+                    <p>Answer the following questions about ocean temperature, salinity, and density:</p>
+            `;
+            
+            graphQuestions.forEach((q, index) => {
+                html += `
+                    <div class="input-group">
+                        <label><strong>${index + 1}. ${q.question}</strong></label>
+                        <textarea id="graph-test-${index}" placeholder="Write your answer here..." style="width: 100%; padding: 10px; border-radius: 8px; min-height: 80px;"></textarea>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            html += `
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-success" onclick="submitTest()" style="font-size: 1.2em; padding: 15px 40px;">Submit Test</button>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        let testAnswers = {tf: [], vocab: [], stats: []};
+
+        function setTestAnswer(type, index, value) {
+            if (type === 'tf') {
+                testAnswers.tf[index] = value;
+            }
+        }
+
+        function submitTest() {
+            // Calculate True/False score
+            let tfScore = 0;
+            testAnswers.tf.forEach((ans, i) => {
+                if (ans === trueFalseQuestions[i].answer) tfScore++;
+            });
+            
+            // Check statistics - all problems now
+            let statsScore = 0;
+            for (let i = 0; i < statisticsProblems.length; i++) {
+                const range = document.getElementById(`test-range-${i}`).value;
+                const mean = document.getElementById(`test-mean-${i}`).value;
+                
+                if (parseFloat(range) === parseFloat(statisticsProblems[i].rangeAnswer)) statsScore += 0.5;
+                if (parseFloat(mean) === parseFloat(statisticsProblems[i].meanAnswer)) statsScore += 0.5;
+            }
+            
+            // Note: Vocabulary, matching, and graph questions would need manual grading
+            const autoGradedTotal = tfScore + statsScore;
+            const autoGradedMax = trueFalseQuestions.length + statisticsProblems.length;
+            const percentage = ((autoGradedTotal / autoGradedMax) * 100).toFixed(1);
+            
+            const totalQuestions = trueFalseQuestions.length + 
+                                  (vocabulary.lesson1.length + vocabulary.lesson2.length) + 
+                                  matchingPairs.length + 
+                                  statisticsProblems.length + 
+                                  graphQuestions.length;
+            
+            const content = document.getElementById('contentSection');
+            content.innerHTML = `
+                <div class="score-display">
+                    <h2>Test Complete!</h2>
+                    <h3 style="margin: 20px 0;">Auto-Graded Section:</h3>
+                    <h1 style="font-size: 4em; margin: 20px 0;">${autoGradedTotal}/${autoGradedMax}</h1>
+                    <h3>${percentage}%</h3>
+                    <p style="margin-top: 20px;">
+                        True/False: ${tfScore}/${trueFalseQuestions.length}<br>
+                        Statistics: ${statsScore}/${statisticsProblems.length}
+                    </p>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>📝 Test Summary</h3>
+                    <p><strong>Total Questions on Test: ${totalQuestions}</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 15px; line-height: 1.8;">
+                        <li>True/False: ${trueFalseQuestions.length} questions ✅ Auto-graded</li>
+                        <li>Vocabulary: ${vocabulary.lesson1.length + vocabulary.lesson2.length} definitions ⚠️ Review your answers</li>
+                        <li>Matching: ${matchingPairs.length} pairs ⚠️ Review your answers</li>
+                        <li>Statistics: ${statisticsProblems.length} problems ✅ Auto-graded</li>
+                        <li>Graph Analysis: ${graphQuestions.length} questions ⚠️ Review your answers</li>
+                    </ul>
+                    
+                    <div class="hint-box" style="margin-top: 20px;">
+                        <strong>📌 Note:</strong> Vocabulary definitions, matching, and graph analysis questions require manual review. 
+                        Check your written answers against the study materials!
+                    </div>
+                    
+                    <p style="margin-top: 20px;">
+                        ${percentage >= 80 ? '🎉 Great job on the auto-graded sections! Review your other answers and you\'ll be well prepared!' : 'Keep studying! Review the flashcards and practice problems again.'}
+                    </p>
+                    <div style="text-align: center; margin-top: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn" onclick="showSection('flashcards')">📚 Review Flashcards</button>
+                        <button class="btn" onclick="showSection('matching')">🎯 Practice Matching</button>
+                        <button class="btn" onclick="showSection('statistics')">📈 Practice Statistics</button>
+                        <button class="btn" onclick="renderTest()">🔄 Retake Test</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize with flashcards
+        renderFlashcards();
+    </script>
+</body>
+</html>
